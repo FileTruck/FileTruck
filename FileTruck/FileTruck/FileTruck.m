@@ -3,7 +3,7 @@
 //  FileTruck
 //
 //  Created by Chris Grant on 06/03/2014.
-//    Copyright (c) 2014 ScottLogic. All rights reserved.
+//  Copyright (c) 2014 ScottLogic. All rights reserved.
 //
 
 #import "FileTruck.h"
@@ -13,12 +13,12 @@ static FileTruck *sharedPlugin;
 @interface FileTruck()
 
 @property (nonatomic, strong) NSBundle *bundle;
+
 @end
 
 @implementation FileTruck
 
-+ (void)pluginDidLoad:(NSBundle *)plugin
-{
++ (void)pluginDidLoad:(NSBundle *)plugin {
     static id sharedPlugin = nil;
     static dispatch_once_t onceToken;
     NSString *currentApplicationName = [[NSBundle mainBundle] infoDictionary][@"CFBundleName"];
@@ -29,19 +29,16 @@ static FileTruck *sharedPlugin;
     }
 }
 
-- (id)initWithBundle:(NSBundle *)plugin
-{
+- (id)initWithBundle:(NSBundle *)plugin {
     if (self = [super init]) {
-        // reference to plugin's bundle, for resource acccess
         self.bundle = plugin;
-        
-        // Create menu items, initialize UI, etc.
 
-        // Sample Menu Item:
         NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
         if (menuItem) {
             [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
-            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Do Action" action:@selector(doMenuAction) keyEquivalent:@""];
+            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"Do Action"
+                                                                    action:@selector(doMenuAction)
+                                                             keyEquivalent:@""];
             [actionMenuItem setTarget:self];
             [[menuItem submenu] addItem:actionMenuItem];
         }
@@ -49,15 +46,59 @@ static FileTruck *sharedPlugin;
     return self;
 }
 
-// Sample Action, for menu item:
-- (void)doMenuAction
-{
-    NSAlert *alert = [NSAlert alertWithMessageText:@"Hello, World" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@""];
-    [alert runModal];
+- (void)doMenuAction {
+    NSURL *path = [FileTruck findProjectFilePath];
+    if (path) {
+        NSAlert *alert = [NSAlert alertWithMessageText:@"FileTruck"
+                                         defaultButton:nil
+                                       alternateButton:nil
+                                           otherButton:nil
+                             informativeTextWithFormat:@"Path: %@", path.absoluteString];
+        [alert runModal];
+    }
 }
 
-- (void)dealloc
-{
++ (NSURL*)findProjectFilePath {
+    
+    IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController *)[self windowController];
+    IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
+    IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
+    id currentNavigator = [navigatorArea currentNavigator];
+    if (![currentNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
+        return nil;
+    }
+    
+    NSMutableArray *projectFiles = [NSMutableArray new];
+    NSArray *navigatorObjects = [currentNavigator objects];
+    [navigatorObjects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        IDEFileNavigableItem *navItem = obj;
+        if ([navItem isKindOfClass:NSClassFromString(@"IDEContainerFileReferenceNavigableItem")]) {
+            [projectFiles addObject:navItem];
+        }
+    }];
+
+    if (projectFiles.count != 1) {
+        NSAlert *alert = [NSAlert alertWithMessageText:@"Multiple Project Files"
+                                         defaultButton:nil
+                                       alternateButton:nil
+                                           otherButton:nil
+                             informativeTextWithFormat:@"There were %lu project files.", projectFiles.count];
+        [alert runModal];
+    }
+    else {
+        IDEFileReference *fileReference = [projectFiles.firstObject representedObject];
+        NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
+        return folderURL;
+    }
+    
+    return nil;
+}
+
++ (NSWindowController *)windowController {
+    return [[NSApp keyWindow] windowController];
+}
+
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

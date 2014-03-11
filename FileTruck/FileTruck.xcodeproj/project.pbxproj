@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		702A966418CDD92400F6FDD8 /* FileTruck.m in Sources */ = {isa = PBXBuildFile; fileRef = 7043111618C8B7BF0061D398 /* FileTruck.m */; };
 		7043110C18C8B7BF0061D398 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110B18C8B7BF0061D398 /* AppKit.framework */; };
 		7043110E18C8B7BF0061D398 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110D18C8B7BF0061D398 /* Foundation.framework */; };
 		7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7043111218C8B7BF0061D398 /* InfoPlist.strings */; };
-		7043111718C8B7BF0061D398 /* FileTruck.m in Sources */ = {isa = PBXBuildFile; fileRef = 7043111618C8B7BF0061D398 /* FileTruck.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +109,7 @@
 		7043110018C8B7BF0061D398 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = CR;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = ScottLogic;
 			};
@@ -145,7 +146,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7043111718C8B7BF0061D398 /* FileTruck.m in Sources */,
+				702A966418CDD92400F6FDD8 /* FileTruck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +281,7 @@
 				7043111D18C8B7BF0061D398 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
