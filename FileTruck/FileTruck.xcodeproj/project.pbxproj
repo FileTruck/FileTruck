@@ -11,6 +11,7 @@
 		7043110C18C8B7BF0061D398 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110B18C8B7BF0061D398 /* AppKit.framework */; };
 		7043110E18C8B7BF0061D398 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110D18C8B7BF0061D398 /* Foundation.framework */; };
 		7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7043111218C8B7BF0061D398 /* InfoPlist.strings */; };
+		705EACC418CF1BB800ABB7DD /* projparse in Resources */ = {isa = PBXBuildFile; fileRef = 705EACC318CF1BB800ABB7DD /* projparse */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		7043111518C8B7BF0061D398 /* FileTruck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileTruck.h; sourceTree = "<group>"; };
 		7043111618C8B7BF0061D398 /* FileTruck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileTruck.m; sourceTree = "<group>"; };
 		7043111818C8B7BF0061D398 /* FileTruck-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FileTruck-Prefix.pch"; sourceTree = "<group>"; };
+		705EACC318CF1BB800ABB7DD /* projparse */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = projparse; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 		7043111018C8B7BF0061D398 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				705EACC318CF1BB800ABB7DD /* projparse */,
 				7043111118C8B7BF0061D398 /* FileTruck-Info.plist */,
 				7043111218C8B7BF0061D398 /* InfoPlist.strings */,
 				7043111818C8B7BF0061D398 /* FileTruck-Prefix.pch */,
@@ -136,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */,
+				705EACC418CF1BB800ABB7DD /* projparse in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

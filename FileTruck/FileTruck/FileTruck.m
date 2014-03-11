@@ -47,18 +47,33 @@ static FileTruck *sharedPlugin;
 }
 
 - (void)doMenuAction {
-    NSURL *path = [FileTruck findProjectFilePath];
-    if (path) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"FileTruck"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"Path: %@", path.absoluteString];
-        [alert runModal];
+    NSString *path = [FileTruck findProjectFilePath];
+    NSString *scriptPath = [FileTruck findScriptFilePathInBundle:self.bundle];
+    if (path && scriptPath) {
+        [self runScript:scriptPath onProjectFile:path];
     }
 }
 
-+ (NSURL*)findProjectFilePath {
+- (void)runScript:(NSString*)script onProjectFile:(NSString*)project {
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:script];
+    
+    NSArray *arguments = @[project];
+    [task setArguments: arguments];
+    
+    NSPipe *pipe = [NSPipe pipe];
+    [task setStandardOutput:pipe];
+    
+    NSFileHandle *file = [pipe fileHandleForReading];
+    [task launch];
+    
+    NSData *data = [file readDataToEndOfFile];
+    NSString *scriptResult = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    [self showAlertWithTitle:@"FileTruck" infoText:@"Script Results:" andContent:scriptResult];
+}
+
++ (NSString*)findProjectFilePath {
     IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController *)[self windowController];
     IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
     IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
@@ -86,14 +101,48 @@ static FileTruck *sharedPlugin;
     else {
         IDEFileReference *fileReference = [projectFiles.firstObject representedObject];
         NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
-        return folderURL;
+        NSString *path = folderURL.path;
+        return [path stringByAppendingPathComponent:@"project.pbxproj"];
     }
-    
     return nil;
+}
+
++ (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
+    return [bundle pathForResource:@"projparse" ofType:nil];
 }
 
 + (NSWindowController *)windowController {
     return [[NSApp keyWindow] windowController];
+}
+
+- (void)showAlertWithTitle:(NSString *)title infoText:(NSString *)infoText andContent:(NSString *)content {
+    NSAlert *alert = [NSAlert alertWithMessageText:title
+                                     defaultButton:nil
+                                   alternateButton:nil
+                                       otherButton:nil
+                         informativeTextWithFormat:@"%@", infoText];
+    
+    NSScrollView *scrollview = [[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, 600, 350)];
+    NSSize contentSize = [scrollview contentSize];
+    [scrollview setBorderType:NSLineBorder];
+    [scrollview setHasVerticalScroller:YES];
+    [scrollview setHasHorizontalScroller:NO];
+    [scrollview setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    alert.accessoryView = scrollview;
+    
+    NSTextView *contentTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
+    [contentTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
+    [contentTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+    [contentTextView setVerticallyResizable:YES];
+    [contentTextView setHorizontallyResizable:NO];
+    [contentTextView setAutoresizingMask:NSViewWidthSizable];
+    [[contentTextView textContainer] setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
+    [[contentTextView textContainer] setWidthTracksTextView:YES];
+    [contentTextView insertText:content];
+    [contentTextView setEditable:NO];
+    [scrollview setDocumentView:contentTextView];
+    
+    [alert runModal];
 }
 
 - (void)dealloc {
