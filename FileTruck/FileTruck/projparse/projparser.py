@@ -38,7 +38,9 @@ class Section:
 def parse_sections(lines):
 	""" parse a project file, looking for section definitions """
 
-	section_regex_start = re.compile('\s*([0-9A-F]+) /\* ([^*]+) \*/', re.I)
+	section_regex_start = re.compile(
+			'\s*([0-9A-F]+) /\* ([^*]+) \*/ = {$', re.I)
+
 	section_regex_end = re.compile('\s*};$')
 
 	children_regex = re.compile('\s*([0-9A-F]+) /\* ([^*]+) \*/,', re.I)
