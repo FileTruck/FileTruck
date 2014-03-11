@@ -59,7 +59,6 @@ static FileTruck *sharedPlugin;
 }
 
 + (NSURL*)findProjectFilePath {
-    
     IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController *)[self windowController];
     IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
     IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
@@ -70,8 +69,7 @@ static FileTruck *sharedPlugin;
     
     NSMutableArray *projectFiles = [NSMutableArray new];
     NSArray *navigatorObjects = [currentNavigator objects];
-    [navigatorObjects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        IDEFileNavigableItem *navItem = obj;
+    [navigatorObjects enumerateObjectsUsingBlock:^(IDEFileNavigableItem *navItem, NSUInteger idx, BOOL *stop) {
         if ([navItem isKindOfClass:NSClassFromString(@"IDEContainerFileReferenceNavigableItem")]) {
             [projectFiles addObject:navItem];
         }
