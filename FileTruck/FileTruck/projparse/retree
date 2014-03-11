@@ -6,10 +6,47 @@ import sys
 import projparser
 
 
-lines = [line for line in fileinput.input()]
+def listproj(argv):
+	lines = [line for line in fileinput.input(argv)]
+	sections = projparser.parse(lines)
 
-sections = projparser.parse(lines)
+	for section in sections:
+		print section.name
 
-# dump top-level parents recursively
-for section in sections:
-	projparser.dump_section(section)
+
+def filesort(argv):
+	if len(argv) < 1:
+		usage()
+	pass
+
+commands = {
+	"list": {
+		'fn': listproj,
+		'desc': "list: list the top level sections of a project file"
+	},
+	"sort": {
+		'fn': filesort,
+		'desc': "sort <section>: reorganise files to match the project hierarchy"
+	},
+}
+
+def usage():
+	print >>sys.stderr, "" + \
+		"Usage: %s <command> [file]\n" % sys.argv[0] + \
+		"\n" + \
+		"where command is one of:"
+
+	for key in commands.keys():
+		desc = commands[key]['desc']
+		print >>sys.stderr, "  " + desc
+
+	sys.exit(1)
+
+
+if len(sys.argv) == 1:
+	usage()
+
+if commands.has_key(sys.argv[1]):
+	commands[sys.argv[1]]["fn"](sys.argv[2:])
+else:
+	usage()
