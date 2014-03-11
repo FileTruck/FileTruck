@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import fileinput # like perl's <>
 import re
 import sys
 
@@ -36,7 +35,7 @@ class Section:
 		self.parent = parent
 
 
-def parse_sections():
+def parse_sections(lines):
 	""" parse a project file, looking for section definitions """
 
 	section_regex_start = re.compile('\s*([0-9A-F]+) /\* ([^*]+) \*/', re.I)
@@ -50,7 +49,7 @@ def parse_sections():
 	current_section = None
 	got_children = False
 
-	for line in fileinput.input():
+	for line in lines:
 		if current_section:
 			end = section_regex_end.match(line)
 			if end:
@@ -112,17 +111,16 @@ def dump_section(section, indent = 0):
 		child = section.children[id]
 		dump_section(child, indent + 1)
 
-# parse and convert soft links to hard references to other sections
-sections = parse_sections()
-sections = link_sections(sections)
+def parse(lines):
+	# parse and convert soft links to hard references to other sections
+	sections = parse_sections(lines)
+	sections = link_sections(sections)
 
-# find the top-level parents
-top_level_sections = []
-for id in sections.keys():
-	candidate = sections[id]
-	if not candidate.parent:
-		top_level_sections.append(candidate)
+	# find the top-level parents
+	top_level_sections = []
+	for id in sections.keys():
+		candidate = sections[id]
+		if not candidate.parent:
+			top_level_sections.append(candidate)
 
-# dump top-level parents recursively
-for top_level_section in top_level_sections:
-	dump_section(top_level_section)
+	return top_level_sections
