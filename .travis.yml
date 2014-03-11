@@ -1,1 +1,8 @@
 language: objective-c
+notifications:
+  email:
+    recipients:
+      - cgrant@scottlogic.com
+      - rpilling@scottlogic.com
+    on_success: [always|never|change] # default: change
+    on_failure: [always|never|change] # default: always
