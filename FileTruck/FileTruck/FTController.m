@@ -36,7 +36,7 @@
 }
 
 - (void)runScriptOnCurrentProject {
-    NSString *path = [FTController findProjectFilePath];
+    NSString *path = [self findProjectFilePath];
     NSString *scriptPath = [FTController findScriptFilePathInBundle:self.bundle];
     if (path && scriptPath) {
         [self runScript:scriptPath onProjectFile:path];
@@ -62,49 +62,55 @@
     [self showAlertWithTitle:@"FileTruck" infoText:@"Script Results:" andContent:scriptResult];
 }
 
-+ (NSString*)findProjectFilePath {
-    if(![[self windowController] isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
+- (NSString*)findProjectFilePath {
+    id windowController = [self windowController];
+    if(![windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
         return nil;
     }
-    IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController *)[self windowController];
-    
+    IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController*)windowController;
     IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
     IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
-    id currentNavigator = [navigatorArea currentNavigator];
-    if (![currentNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
+    
+    // Store the identifier for the current navigator.
+    NSString *oldIdentifier = [navigatorArea _currentExtensionIdentifier];
+    
+    // Change to the structure navigator so we can find the objects.
+    [navigatorArea showNavigatorWithIdentifier:@"Xcode.IDEKit.Navigator.Structure"];
+    IDEStructureNavigator *newNavigator = [navigatorArea currentNavigator];
+    if (![newNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
         return nil;
     }
+    NSArray *navigatorObjects = [newNavigator objects];
     
+    // Move back to the old navigator.
+    [navigatorArea showNavigatorWithIdentifier:oldIdentifier];
+    
+    // Iterate through the objects and find the project files.
     NSMutableArray *projectFiles = [NSMutableArray new];
-    NSArray *navigatorObjects = [currentNavigator objects];
-    [navigatorObjects enumerateObjectsUsingBlock:^(IDEFileNavigableItem *navItem, NSUInteger idx, BOOL *stop) {
+    for (IDEFileNavigableItem *navItem in navigatorObjects) {
         if ([navItem isKindOfClass:NSClassFromString(@"IDEContainerFileReferenceNavigableItem")]) {
             [projectFiles addObject:navItem];
         }
-    }];
+    }
     
     if (projectFiles.count != 1) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Multiple Project Files"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"There were %lu project files.", projectFiles.count];
-        [alert runModal];
+        [self showAlertWithTitle:@"Multiple Project Files"
+                        infoText:@"There were %lu project files."
+                      andContent:[NSString stringWithFormat:@"There were %lu project files.", projectFiles.count]];
+        return nil;
     }
-    else {
-        IDEFileReference *fileReference = [projectFiles.firstObject representedObject];
-        NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
-        NSString *path = folderURL.path;
-        return [path stringByAppendingPathComponent:@"project.pbxproj"];
-    }
-    return nil;
+    
+    IDEFileReference *fileReference = [projectFiles.firstObject representedObject];
+    NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
+    NSString *path = folderURL.path;
+    return [path stringByAppendingPathComponent:@"project.pbxproj"];
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
     return [bundle pathForResource:@"retree" ofType:nil];
 }
 
-+ (NSWindowController *)windowController {
+- (NSWindowController *)windowController {
     NSMutableArray *windowControllers = [NSMutableArray new];
     
     for(NSWindow *window in [NSApp windows]) {
@@ -115,12 +121,9 @@
     }
     
     if(windowControllers.count > 1) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Multiple Windows"
-                                         defaultButton:nil
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"There were %lu windows. Don't know what to do.", windowControllers.count];
-        [alert runModal];
+        [self showAlertWithTitle:@"Multiple Windows"
+                        infoText:[NSString stringWithFormat:@"There were %lu windows. Don't know what to do.", windowControllers.count]
+                      andContent:nil];
         return nil;
     }
     
@@ -133,26 +136,27 @@
                                    alternateButton:nil
                                        otherButton:nil
                          informativeTextWithFormat:@"%@", infoText];
-    
-    NSScrollView *scrollview = [[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, 600, 350)];
-    [scrollview setBorderType:NSLineBorder];
-    [scrollview setHasVerticalScroller:YES];
-    [scrollview setHasHorizontalScroller:NO];
-    [scrollview setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-    alert.accessoryView = scrollview;
-    
-    NSSize contentSize = [scrollview contentSize];
-    NSTextView *contentTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
-    [contentTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
-    [contentTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    [contentTextView setVerticallyResizable:YES];
-    [contentTextView setHorizontallyResizable:NO];
-    [contentTextView setAutoresizingMask:NSViewWidthSizable];
-    [[contentTextView textContainer] setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
-    [[contentTextView textContainer] setWidthTracksTextView:YES];
-    [contentTextView insertText:content];
-    [contentTextView setEditable:NO];
-    [scrollview setDocumentView:contentTextView];
+    if(content) {
+        NSScrollView *scrollview = [[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, 600, 350)];
+        [scrollview setBorderType:NSLineBorder];
+        [scrollview setHasVerticalScroller:YES];
+        [scrollview setHasHorizontalScroller:NO];
+        [scrollview setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+        alert.accessoryView = scrollview;
+        
+        NSSize contentSize = [scrollview contentSize];
+        NSTextView *contentTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
+        [contentTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
+        [contentTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+        [contentTextView setVerticallyResizable:YES];
+        [contentTextView setHorizontallyResizable:NO];
+        [contentTextView setAutoresizingMask:NSViewWidthSizable];
+        [[contentTextView textContainer] setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
+        [[contentTextView textContainer] setWidthTracksTextView:YES];
+        [contentTextView insertText:content];
+        [contentTextView setEditable:NO];
+        [scrollview setDocumentView:contentTextView];
+    }
     
     [alert runModal];
 }

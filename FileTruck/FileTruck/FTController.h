@@ -36,6 +36,8 @@
 
 @interface IDENavigatorArea : NSObject
 - (id)currentNavigator;
+- (void)showNavigatorWithIdentifier:(id)identifier;
+- (id)_currentExtensionIdentifier;
 @end
 
 @interface IDEWorkspaceTabController : NSObject
