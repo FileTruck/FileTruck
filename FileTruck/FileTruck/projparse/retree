@@ -1,0 +1,81 @@
+#!/usr/bin/python
+
+import fileinput
+import sys
+
+import projparser
+
+def get_entries(argv):
+	lines = [line for line in fileinput.input(argv)]
+	return projparser.parse(lines)
+
+def listproj(argv):
+	entries = get_entries(argv)
+
+	for ent in entries:
+		if not ent.is_file():
+			print ent.name
+
+def full_listproj(argv):
+	def entry_print(ent, nest):
+		sys.stdout.write(' ' * nest)
+		print "%s (%s)" % (ent.name, ent.id)
+
+	for ent in get_entries(argv):
+		ent.visit(entry_print, 0)
+
+def reorder_section(section):
+	def rewrite_file(file):
+		print "TODO: " + file.name
+
+	for child in section.children:
+		if child.is_file():
+			rewrite_file(child)
+		else:
+			reorder_section(child)
+
+def filesort(argv):
+	if len(argv) < 1:
+		usage()
+	reorder_name = argv[0]
+	sections_and_files = get_entries(argv[1:])
+
+	for section in sections_and_files:
+		if section.name == reorder_name:
+			reorder_section(section)
+
+commands = {
+	"list": {
+		'fn': listproj,
+		'desc': "list: list the top level sections of a project file"
+	},
+	"full-list": {
+		'fn': full_listproj,
+		'desc': "full-list: recursively list the project file entries"
+	},
+	"sort": {
+		'fn': filesort,
+		'desc': "sort <section>: reorganise files to match the project hierarchy"
+	},
+}
+
+def usage():
+	print >>sys.stderr, "" + \
+		"Usage: %s <command> [file]\n" % sys.argv[0] + \
+		"\n" + \
+		"where command is one of:"
+
+	for key in commands.keys():
+		desc = commands[key]['desc']
+		print >>sys.stderr, "  " + desc
+
+	sys.exit(1)
+
+
+if len(sys.argv) == 1:
+	usage()
+
+if commands.has_key(sys.argv[1]):
+	commands[sys.argv[1]]["fn"](sys.argv[2:])
+else:
+	usage()

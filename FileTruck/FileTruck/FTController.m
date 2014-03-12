@@ -101,7 +101,7 @@
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
-    return [bundle pathForResource:@"projparse" ofType:nil];
+    return [bundle pathForResource:@"retree" ofType:nil];
 }
 
 + (NSWindowController *)windowController {
