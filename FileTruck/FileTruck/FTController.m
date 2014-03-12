@@ -114,8 +114,13 @@
         }
     }
     
-    if(windowControllers.count != 1) {
-        [NSException raise:@"There should only be 1 window controller" format:@"Multiple window controllers!"];
+    if(windowControllers.count > 1) {
+        NSAlert *alert = [NSAlert alertWithMessageText:@"Multiple Windows"
+                                         defaultButton:nil
+                                       alternateButton:nil
+                                           otherButton:nil
+                             informativeTextWithFormat:@"There were %lu windows. Don't know what to do.", windowControllers.count];
+        [alert runModal];
         return nil;
     }
     
