@@ -12,6 +12,9 @@
 		7043110E18C8B7BF0061D398 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110D18C8B7BF0061D398 /* Foundation.framework */; };
 		7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7043111218C8B7BF0061D398 /* InfoPlist.strings */; };
 		705EACC418CF1BB800ABB7DD /* projparse in Resources */ = {isa = PBXBuildFile; fileRef = 705EACC318CF1BB800ABB7DD /* projparse */; };
+		705EACCA18D06FA400ABB7DD /* FTWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EACC818D06FA400ABB7DD /* FTWindowController.m */; };
+		705EACCB18D06FA400ABB7DD /* FTWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 705EACC918D06FA400ABB7DD /* FTWindowController.xib */; };
+		705EACCE18D0770A00ABB7DD /* FTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EACCD18D0770A00ABB7DD /* FTController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,11 @@
 		7043111618C8B7BF0061D398 /* FileTruck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileTruck.m; sourceTree = "<group>"; };
 		7043111818C8B7BF0061D398 /* FileTruck-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FileTruck-Prefix.pch"; sourceTree = "<group>"; };
 		705EACC318CF1BB800ABB7DD /* projparse */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = projparse; sourceTree = "<group>"; };
+		705EACC718D06FA400ABB7DD /* FTWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTWindowController.h; sourceTree = "<group>"; };
+		705EACC818D06FA400ABB7DD /* FTWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTWindowController.m; sourceTree = "<group>"; };
+		705EACC918D06FA400ABB7DD /* FTWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FTWindowController.xib; sourceTree = "<group>"; };
+		705EACCC18D0770A00ABB7DD /* FTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTController.h; sourceTree = "<group>"; };
+		705EACCD18D0770A00ABB7DD /* FTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +78,11 @@
 			children = (
 				7043111518C8B7BF0061D398 /* FileTruck.h */,
 				7043111618C8B7BF0061D398 /* FileTruck.m */,
+				705EACCC18D0770A00ABB7DD /* FTController.h */,
+				705EACCD18D0770A00ABB7DD /* FTController.m */,
+				705EACC718D06FA400ABB7DD /* FTWindowController.h */,
+				705EACC818D06FA400ABB7DD /* FTWindowController.m */,
+				705EACC918D06FA400ABB7DD /* FTWindowController.xib */,
 				7043111018C8B7BF0061D398 /* Supporting Files */,
 			);
 			path = FileTruck;
@@ -139,6 +152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */,
+				705EACCB18D06FA400ABB7DD /* FTWindowController.xib in Resources */,
 				705EACC418CF1BB800ABB7DD /* projparse in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,6 +165,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				702A966418CDD92400F6FDD8 /* FileTruck.m in Sources */,
+				705EACCA18D06FA400ABB7DD /* FTWindowController.m in Sources */,
+				705EACCE18D0770A00ABB7DD /* FTController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
