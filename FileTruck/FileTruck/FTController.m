@@ -47,7 +47,7 @@
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:script];
     
-    NSArray *arguments = @[project];
+    NSArray *arguments = @[@"full-list", project];
     [task setArguments: arguments];
     
     NSPipe *pipe = [NSPipe pipe];
