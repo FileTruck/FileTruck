@@ -52,8 +52,14 @@
 
 @property (nonatomic) BOOL monitorForChanges;
 
+@property (nonatomic) NSArray *projectFiles;
+
 - (id)initWithBundle:(NSBundle *)plugin;
 
-- (void)runScriptOnCurrentProject;
+- (void)runScriptOnItem:(IDEFileNavigableItem*)item;
+
+- (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project;
+- (void)monitorProject:(IDEFileNavigableItem*)project;
+- (void)unmonitorProject:(IDEFileNavigableItem*)project;
 
 @end

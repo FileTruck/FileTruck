@@ -12,6 +12,7 @@
 @interface FTController ()
 
 @property NSBundle *bundle;
+@property NSMutableArray *monitoredFilePaths;
 
 @end
 
@@ -20,6 +21,7 @@
 - (id)initWithBundle:(NSBundle *)plugin {
     if(self = [super init]) {
         self.bundle = plugin;
+        self.monitoredFilePaths = [NSMutableArray new];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(observed:)
@@ -29,17 +31,31 @@
     return self;
 }
 
--(void)observed:(NSNotification*)notification {
-    if(self.monitorForChanges) {
-        [self runScriptOnCurrentProject];
+- (void)observed:(NSNotification*)notification {
+    id object = [notification object];
+    NSString *path = [object path];
+    if([self.monitoredFilePaths containsObject:path]) {
+        [self runScriptOnProjectPath:path];
     }
 }
 
-- (void)runScriptOnCurrentProject {
-    NSString *path = [self findProjectFilePath];
+- (void)runScriptOnItem:(IDEFileNavigableItem*)item {
     NSString *scriptPath = [FTController findScriptFilePathInBundle:self.bundle];
-    if (path && scriptPath) {
-        [self runScript:scriptPath onProjectFile:path];
+    if(scriptPath) {
+        IDEFileReference *fileReference = [item representedObject];
+        NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
+        NSString *path = folderURL.path;
+        [self runScriptOnProjectPath:path];
+    }
+}
+
+- (void)runScriptOnProjectPath:(NSString*)path {
+    NSString *scriptPath = [FTController findScriptFilePathInBundle:self.bundle];
+    if(scriptPath) {
+        path = [path stringByAppendingPathComponent:@"project.pbxproj"];
+        if (path) {
+            [self runScript:scriptPath onProjectFile:path];
+        }
     }
 }
 
@@ -62,55 +78,67 @@
     [self showAlertWithTitle:@"FileTruck" infoText:@"Script Results:" andContent:scriptResult];
 }
 
-- (NSString*)findProjectFilePath {
-    id windowController = [self windowController];
-    if(![windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
-        return nil;
-    }
-    IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController*)windowController;
-    IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
-    IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
-    
-    // Store the identifier for the current navigator.
-    NSString *oldIdentifier = [navigatorArea _currentExtensionIdentifier];
-    
-    // Change to the structure navigator so we can find the objects.
-    [navigatorArea showNavigatorWithIdentifier:@"Xcode.IDEKit.Navigator.Structure"];
-    IDEStructureNavigator *newNavigator = [navigatorArea currentNavigator];
-    if (![newNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
-        return nil;
-    }
-    NSArray *navigatorObjects = [newNavigator objects];
-    
-    // Move back to the old navigator.
-    [navigatorArea showNavigatorWithIdentifier:oldIdentifier];
-    
-    // Iterate through the objects and find the project files.
+- (NSArray*)projectFiles {
+    NSArray *windowControllers = [self windowController];
     NSMutableArray *projectFiles = [NSMutableArray new];
-    for (IDEFileNavigableItem *navItem in navigatorObjects) {
-        if ([navItem isKindOfClass:NSClassFromString(@"IDEContainerFileReferenceNavigableItem")]) {
-            [projectFiles addObject:navItem];
+    
+    for (NSWindowController *windowController in windowControllers) {
+        if(![windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
+            return nil;
+        }
+        
+        IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController*)windowController;
+        IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
+        IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
+        
+        // Store the identifier for the current navigator.
+        NSString *oldIdentifier = [navigatorArea _currentExtensionIdentifier];
+        
+        // Change to the structure navigator so we can find the objects.
+        [navigatorArea showNavigatorWithIdentifier:@"Xcode.IDEKit.Navigator.Structure"];
+        IDEStructureNavigator *newNavigator = [navigatorArea currentNavigator];
+        if (![newNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
+            return nil;
+        }
+        NSArray *navigatorObjects = [newNavigator objects];
+        
+        // Move back to the old navigator.
+        [navigatorArea showNavigatorWithIdentifier:oldIdentifier];
+        
+        // Iterate through the objects and find the project files.
+        for (IDEFileNavigableItem *navItem in navigatorObjects) {
+            if ([navItem isKindOfClass:NSClassFromString(@"IDEContainerFileReferenceNavigableItem")]) {
+                [projectFiles addObject:navItem];
+            }
         }
     }
-    
-    if (projectFiles.count != 1) {
-        [self showAlertWithTitle:@"Multiple Project Files"
-                        infoText:@"There were %lu project files."
-                      andContent:[NSString stringWithFormat:@"There were %lu project files.", projectFiles.count]];
-        return nil;
-    }
-    
-    IDEFileReference *fileReference = [projectFiles.firstObject representedObject];
-    NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
-    NSString *path = folderURL.path;
-    return [path stringByAppendingPathComponent:@"project.pbxproj"];
+    return projectFiles;
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
     return [bundle pathForResource:@"retree" ofType:nil];
 }
 
-- (NSWindowController *)windowController {
+- (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project {
+    return [self.monitoredFilePaths containsObject:[FTController filePathStringFromProject:project]];
+}
+
+- (void)monitorProject:(IDEFileNavigableItem*)project {
+    [self.monitoredFilePaths addObject:[FTController filePathStringFromProject:project]];
+}
+
+- (void)unmonitorProject:(IDEFileNavigableItem*)project {
+    [self.monitoredFilePaths removeObject:[FTController filePathStringFromProject:project]];
+}
+
++ (NSString*)filePathStringFromProject:(IDEFileNavigableItem*)project {
+    IDEFileReference *fileReference = [project representedObject];
+    NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
+    NSString *path = folderURL.path;
+    return path;
+}
+
+- (NSArray*)windowController {
     NSMutableArray *windowControllers = [NSMutableArray new];
     
     for(NSWindow *window in [NSApp windows]) {
@@ -120,14 +148,7 @@
         }
     }
     
-    if(windowControllers.count > 1) {
-        [self showAlertWithTitle:@"Multiple Windows"
-                        infoText:[NSString stringWithFormat:@"There were %lu windows. Don't know what to do.", windowControllers.count]
-                      andContent:nil];
-        return nil;
-    }
-    
-    return windowControllers.firstObject;
+    return windowControllers;
 }
 
 - (void)showAlertWithTitle:(NSString *)title infoText:(NSString *)infoText andContent:(NSString *)content {

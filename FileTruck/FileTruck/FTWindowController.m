@@ -8,12 +8,14 @@
 
 #import "FTWindowController.h"
 
-@interface FTWindowController ()
+@interface FTWindowController () <NSTableViewDataSource>
 
 @property FTController *controller;
 
-@property (weak) IBOutlet NSButton *monitorButton;
-@property (weak) IBOutlet NSButton *runButton;
+@property (weak) IBOutlet NSTableView *tableView;
+@property (weak) IBOutlet NSTableColumn *projectColumn;
+@property (weak) IBOutlet NSTableColumn *monitorColumn;
+@property (weak) IBOutlet NSTableColumn *runNowColumn;
 
 @end
 
@@ -26,17 +28,40 @@
     return self;
 }
 
-- (void)windowDidLoad {
-    [super windowDidLoad];
-    self.monitorButton.state = self.controller.monitorForChanges ? NSOnState : NSOffState;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    return self.controller.projectFiles.count;
 }
 
-- (IBAction)monitorClicked:(NSButton *)sender {
-    self.controller.monitorForChanges = self.monitorButton.state == NSOnState;
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    IDEFileNavigableItem *item = self.controller.projectFiles[row];
+    IDEFileReference *fileReference = [item representedObject];
+    NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
+    NSString *path = folderURL.path;
+
+    if(tableColumn == self.projectColumn) {
+        return path;
+    }
+    else if(tableColumn == self.monitorColumn) {
+        return [NSNumber numberWithBool:[self.controller isProjectMonitored:item]];
+    }
+    
+    return nil;
 }
 
-- (IBAction)runNowClicked:(NSButton *)sender {
-    [self.controller runScriptOnCurrentProject];
+- (IBAction)monitorButtonClicked:(NSButtonCell *)sender {
+    NSInteger clickedRow = [self.tableView clickedRow];
+    IDEFileNavigableItem *item = self.controller.projectFiles[clickedRow];
+    if([self.controller isProjectMonitored:item]) {
+        [self.controller unmonitorProject:item];
+    }
+    else {
+        [self.controller monitorProject:item];
+    }
+}
+
+- (IBAction)runButtonClicked:(NSButtonCell *)sender {
+    NSInteger clickedRow = [self.tableView clickedRow];
+    [self.controller runScriptOnItem:self.controller.projectFiles[clickedRow]];
 }
 
 @end
