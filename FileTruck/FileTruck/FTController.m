@@ -18,10 +18,13 @@
 
 @implementation FTController
 
+NSString const *MonitoredPathsKey = @"MonitoredPaths";
+
 - (id)initWithBundle:(NSBundle *)plugin {
     if(self = [super init]) {
         self.bundle = plugin;
-        self.monitoredFilePaths = [NSMutableArray new];
+        
+        [self initialiseMonitoredFilePaths];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(observed:)
@@ -29,6 +32,44 @@
                                                    object:nil];
     }
     return self;
+}
+
+- (NSString *)preferencesFilePath {
+    NSError *error;
+    NSURL *appSupportDir = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                  inDomain:NSUserDomainMask
+                                                         appropriateForURL:nil
+                                                                    create:YES
+                                                                     error:&error];
+    if(error) {
+        NSLog(@"Error finding directory - %@", error.debugDescription);
+    }
+    
+    NSString *s = [[appSupportDir.path stringByAppendingPathComponent:@"FileTruck"]
+                   stringByAppendingPathComponent:@"fileTruckPreferences.plist"];
+    return s;
+}
+
+- (void)initialiseMonitoredFilePaths {
+    NSString *s = [self preferencesFilePath];
+    
+    if(![[NSFileManager defaultManager] fileExistsAtPath:s isDirectory:NULL]) {
+        NSString *path = [self.bundle pathForResource:@"fileTruckPreferences" ofType:@"plist"];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        
+        NSError *creationError;
+        if(![[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:nil]) {
+            NSLog(@"Could not create file. %@", creationError);
+        }
+    }
+    
+    NSDictionary *plist = [NSDictionary dictionaryWithContentsOfFile:s];
+    if([plist.allKeys containsObject:MonitoredPathsKey]) {
+        self.monitoredFilePaths = [plist[MonitoredPathsKey] mutableCopy];
+    }
+    else {
+        self.monitoredFilePaths = [NSMutableArray new];
+    }
 }
 
 - (void)observed:(NSNotification*)notification {
@@ -123,12 +164,20 @@
     return [self.monitoredFilePaths containsObject:[FTController filePathStringFromProject:project]];
 }
 
+- (void)writePathsToDict {
+    NSMutableDictionary *dict = [NSMutableDictionary new];
+    dict[MonitoredPathsKey] = self.monitoredFilePaths;
+    [dict writeToFile:[self preferencesFilePath] atomically:YES];
+}
+
 - (void)monitorProject:(IDEFileNavigableItem*)project {
     [self.monitoredFilePaths addObject:[FTController filePathStringFromProject:project]];
+    [self writePathsToDict];
 }
 
 - (void)unmonitorProject:(IDEFileNavigableItem*)project {
     [self.monitoredFilePaths removeObject:[FTController filePathStringFromProject:project]];
+    [self writePathsToDict];
 }
 
 + (NSString*)filePathStringFromProject:(IDEFileNavigableItem*)project {
@@ -165,14 +214,14 @@
         [scrollview setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
         alert.accessoryView = scrollview;
         
-        NSSize contentSize = [scrollview contentSize];
-        NSTextView *contentTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
-        [contentTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
+        NSSize sSize = [scrollview contentSize];
+        NSTextView *contentTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, sSize.width, sSize.height)];
+        [contentTextView setMinSize:NSMakeSize(0.0, sSize.height)];
         [contentTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
         [contentTextView setVerticallyResizable:YES];
         [contentTextView setHorizontallyResizable:NO];
         [contentTextView setAutoresizingMask:NSViewWidthSizable];
-        [[contentTextView textContainer] setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
+        [[contentTextView textContainer] setContainerSize:NSMakeSize(sSize.width, FLT_MAX)];
         [[contentTextView textContainer] setWidthTracksTextView:YES];
         [contentTextView insertText:content];
         [contentTextView setEditable:NO];
