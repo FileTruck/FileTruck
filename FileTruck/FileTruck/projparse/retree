@@ -24,15 +24,22 @@ def full_listproj(argv):
 	for ent in get_entries(argv):
 		ent.visit(entry_print, 0)
 
-def reorder_section(section):
-	def rewrite_file(file):
-		print "TODO: " + file.name
+def reorder_section(section, current_path):
+	def rewrite_file(file, current_path):
+		print "would rewrite " + \
+			file.name +            \
+			" to " +               \
+			current_path +         \
+			"/" + file.name
 
-	for child in section.children:
+	current_path = current_path + '/' + section.name
+
+	for child_key in section.children.keys():
+		child = section.children[child_key]
 		if child.is_file():
-			rewrite_file(child)
+			rewrite_file(child, current_path)
 		else:
-			reorder_section(child)
+			reorder_section(child, current_path)
 
 def filesort(argv):
 	if len(argv) < 1:
@@ -42,7 +49,7 @@ def filesort(argv):
 
 	for section in sections_and_files:
 		if section.name == reorder_name:
-			reorder_section(section)
+			reorder_section(section, '.')
 
 commands = {
 	"list": {
