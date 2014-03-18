@@ -48,11 +48,11 @@
 @property (readonly) IDEWorkspaceTabController *activeWorkspaceTabController;
 @end
 
+typedef void (^ProjectFileSubscriber)(NSArray *projects);
+
 @interface FTController : NSObject
 
 @property (nonatomic) BOOL monitorForChanges;
-
-@property (nonatomic) NSArray *projectFiles;
 
 - (id)initWithBundle:(NSBundle *)plugin;
 
@@ -61,5 +61,7 @@
 - (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project;
 - (void)monitorProject:(IDEFileNavigableItem*)project;
 - (void)unmonitorProject:(IDEFileNavigableItem*)project;
+
+- (void)addProjectFilesSubscriberBlock:(ProjectFileSubscriber)block;
 
 @end

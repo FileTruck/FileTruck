@@ -13,6 +13,8 @@
 
 @property NSBundle *bundle;
 @property NSMutableArray *monitoredFilePaths;
+@property NSMutableArray *projectSubscribers;
+@property NSMutableArray *projectFiles;
 
 @end
 
@@ -27,11 +29,32 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
         [self initialiseMonitoredFilePaths];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(observed:)
+                                                 selector:@selector(projectSavedNotification:)
                                                      name:@"PBXProjectSaveNotification"
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(projectOpened:)
+                                                     name:@"PBXProjectDidOpenNotification"
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(projectClosed:)
+                                                     name:@"PBXProjectDidCloseNotification"
                                                    object:nil];
     }
     return self;
+}
+
+-(void)addProjectFilesSubscriberBlock:(ProjectFileSubscriber)block {
+    if(!self.projectSubscribers) {
+        self.projectSubscribers = [NSMutableArray new];
+    }
+    
+    ProjectFileSubscriber copy = [block copy];
+    [self.projectSubscribers addObject:copy];
+    
+    block(self.projectFiles);
 }
 
 - (NSString *)preferencesFilePath {
@@ -72,12 +95,21 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-- (void)observed:(NSNotification*)notification {
+- (void)projectSavedNotification:(NSNotification*)notification {
     id object = [notification object];
     NSString *path = [object path];
     if([self.monitoredFilePaths containsObject:path]) {
         [self runScriptOnProjectPath:path];
     }
+}
+
+- (void)projectOpened:(NSNotification*)notification {
+#warning TODO - Remove this horrible hack. Refresh Project Files can't find anything if it's called straight away.
+    [self performSelector:@selector(refreshProjectFiles) withObject:nil afterDelay:2.0];
+}
+
+- (void)projectClosed:(NSNotification*)notification {
+    [self refreshProjectFiles];
 }
 
 - (void)runScriptOnItem:(IDEFileNavigableItem*)item {
@@ -119,13 +151,13 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     [self showAlertWithTitle:@"FileTruck" infoText:@"Script Results:" andContent:scriptResult];
 }
 
-- (NSArray*)projectFiles {
+- (void)refreshProjectFiles {
     NSArray *windowControllers = [self windowController];
     NSMutableArray *projectFiles = [NSMutableArray new];
     
     for (NSWindowController *windowController in windowControllers) {
         if(![windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
-            return nil;
+            break;
         }
         
         IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController*)windowController;
@@ -139,7 +171,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
         [navigatorArea showNavigatorWithIdentifier:@"Xcode.IDEKit.Navigator.Structure"];
         IDEStructureNavigator *newNavigator = [navigatorArea currentNavigator];
         if (![newNavigator isKindOfClass:NSClassFromString(@"IDEStructureNavigator")]) {
-            return nil;
+            break;
         }
         NSArray *navigatorObjects = [newNavigator objects];
         
@@ -153,7 +185,16 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
             }
         }
     }
-    return projectFiles;
+    
+    self.projectFiles = projectFiles;
+    
+    [self updateAllSubscribers];
+}
+
+- (void)updateAllSubscribers {
+    for(ProjectFileSubscriber block in self.projectSubscribers) {
+        block(self.projectFiles);
+    }
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {

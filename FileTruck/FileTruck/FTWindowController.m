@@ -17,6 +17,8 @@
 @property (weak) IBOutlet NSTableColumn *monitorColumn;
 @property (weak) IBOutlet NSTableColumn *runNowColumn;
 
+@property NSArray *projectFiles;
+
 @end
 
 @implementation FTWindowController
@@ -24,16 +26,23 @@
 - (id)initWithController:(FTController*)controller {
     if(self = [super initWithWindowNibName:@"FTWindowController"]) {
         self.controller = controller;
+        __weak id weakSelf = self;
+        [self.controller addProjectFilesSubscriberBlock:^(NSArray *projects) {
+            if(projects) {
+                [weakSelf setProjectFiles:projects];
+                [[weakSelf tableView] reloadData];
+            }
+        }];
     }
     return self;
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return self.controller.projectFiles.count;
+    return self.projectFiles.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    IDEFileNavigableItem *item = self.controller.projectFiles[row];
+    IDEFileNavigableItem *item = self.projectFiles[row];
     IDEFileReference *fileReference = [item representedObject];
     NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
     NSString *path = folderURL.path;
@@ -50,7 +59,7 @@
 
 - (IBAction)monitorButtonClicked:(NSButtonCell *)sender {
     NSInteger clickedRow = [self.tableView clickedRow];
-    IDEFileNavigableItem *item = self.controller.projectFiles[clickedRow];
+    IDEFileNavigableItem *item = self.projectFiles[clickedRow];
     if([self.controller isProjectMonitored:item]) {
         [self.controller unmonitorProject:item];
     }
@@ -61,7 +70,7 @@
 
 - (IBAction)runButtonClicked:(NSButtonCell *)sender {
     NSInteger clickedRow = [self.tableView clickedRow];
-    [self.controller runScriptOnItem:self.controller.projectFiles[clickedRow]];
+    [self.controller runScriptOnItem:self.projectFiles[clickedRow]];
 }
 
 @end
