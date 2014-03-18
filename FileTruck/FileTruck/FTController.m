@@ -102,7 +102,7 @@
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
-    return [bundle pathForResource:@"retree" ofType:nil];
+    return [bundle pathForResource:@"retree" ofType:"py"];
 }
 
 + (NSWindowController *)windowController {
