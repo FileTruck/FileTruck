@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		702A966418CDD92400F6FDD8 /* FileTruck.m in Sources */ = {isa = PBXBuildFile; fileRef = 7043111618C8B7BF0061D398 /* FileTruck.m */; };
+		703BAC1F18D31A4900AE1DB5 /* fileTruckPreferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = 703BAC1E18D31A4900AE1DB5 /* fileTruckPreferences.plist */; };
 		7043110C18C8B7BF0061D398 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110B18C8B7BF0061D398 /* AppKit.framework */; };
 		7043110E18C8B7BF0061D398 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7043110D18C8B7BF0061D398 /* Foundation.framework */; };
 		7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7043111218C8B7BF0061D398 /* InfoPlist.strings */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		703BAC1E18D31A4900AE1DB5 /* fileTruckPreferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = fileTruckPreferences.plist; sourceTree = "<group>"; };
 		7043110818C8B7BF0061D398 /* FileTruck.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileTruck.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		7043110B18C8B7BF0061D398 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		7043110D18C8B7BF0061D398 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -98,6 +100,7 @@
 				7043111218C8B7BF0061D398 /* InfoPlist.strings */,
 				7043111118C8B7BF0061D398 /* FileTruck-Info.plist */,
 				7043111818C8B7BF0061D398 /* FileTruck-Prefix.pch */,
+				703BAC1E18D31A4900AE1DB5 /* fileTruckPreferences.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -155,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				70618D5F18D084DB00F22908 /* retree in Resources */,
+				703BAC1F18D31A4900AE1DB5 /* fileTruckPreferences.plist in Resources */,
 				70618D5E18D084DB00F22908 /* projparser.py in Resources */,
 				7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */,
 				705EACCB18D06FA400ABB7DD /* FTWindowController.xib in Resources */,

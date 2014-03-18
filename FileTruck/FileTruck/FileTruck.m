@@ -40,9 +40,8 @@ static FileTruck *sharedPlugin;
         self.bundle = plugin;
         
         self.controller = [[FTController alloc] initWithBundle:self.bundle];
-        
         self.window = [[FTWindowController alloc] initWithController:self.controller];
-        
+
         NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
         if (menuItem) {
             [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
