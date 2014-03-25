@@ -136,6 +136,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:script];
     
+    // note: change "full-list" to "sort" to get file sorting
     NSArray *arguments = @[@"full-list", project];
     [task setArguments: arguments];
     
@@ -198,7 +199,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
 }
 
 + (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
-    return [bundle pathForResource:@"retree" ofType:nil];
+    return [bundle pathForResource:@"retree" ofType:"py"];
 }
 
 - (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project {
