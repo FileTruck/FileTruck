@@ -40,7 +40,11 @@ def full_listproj(argv):
 
 	def entry_print(ent, nest):
 		sys.stdout.write(' ' * nest)
-		print "%s (%s)" % (ent.name, ent.id)
+
+		location_extra = ''
+		if ent.location is not None:
+			location_extra = ' (location=%s)' % ent.location
+		print "%s (%s)%s" % (ent.name, ent.id, location_extra)
 
 	for ent in get_entries(argv):
 		ent.visit(entry_print, 0)

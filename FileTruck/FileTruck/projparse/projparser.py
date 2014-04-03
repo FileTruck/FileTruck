@@ -20,9 +20,10 @@ class Entry:
 		fn(self, depth)
 
 class FileReference(Entry):
-	def __init__(self, id, name, path):
+	def __init__(self, id, name, path, location):
 		Entry.__init__(self, id, name)
 		self.path = path
+		self.location = location
 
 	def is_file(self):
 		return True
@@ -36,6 +37,7 @@ class Section(Entry):
 	def __init__(self, id, name):
 		Entry.__init__(self, id, name)
 		self.children = {}
+		self.location = None
 
 	def add_link(self, link):
 		""" add a soft link / forward declaration to a section """
@@ -61,9 +63,12 @@ def parse_proj(lines):
 	children_regex = re.compile('\s*([0-9A-F]+) /\* ([^*]+) \*/,', re.I)
 	children_regex_start = re.compile('\s*children = \(')
 	children_regex_end = re.compile('\s*\);')
+	group_regex = re.compile('\s*sourceTree = ([^;]+);')
 
 	file_reference_regex = re.compile(
-			'\s*([0-9A-F]+) /\* ([^*]+) \*/ = .* path = ([^;]+);', re.I)
+			'\s*([0-9A-F]+) /\* ([^*]+) \*/ = .* ' +
+			'path = ([^;]+); sourceTree = ([^;]+);',
+			re.I)
 
 	entries = {}
 	current_section = None
@@ -90,6 +95,13 @@ def parse_proj(lines):
 			elif children_regex_start.match(line):
 				got_children = True
 
+			else:
+				# no children, try to match a sourceTree = ...; line
+				group = group_regex.match(line)
+				if group:
+					current_section.location = group.groups()[0]
+
+
 		else:
 			# try for a new section
 			new_section_matches = section_regex_start.match(line)
@@ -107,7 +119,8 @@ def parse_proj(lines):
 					id = file_ref_captures.groups()[0]
 					name = file_ref_captures.groups()[1]
 					path = file_ref_captures.groups()[2]
-					entries[id] = FileReference(id, name, path)
+					location = file_ref_captures.groups()[3]
+					entries[id] = FileReference(id, name, path, location)
 
 	return entries
 
