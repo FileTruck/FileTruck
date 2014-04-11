@@ -89,17 +89,15 @@ def construct_dir_for_entry(entry, projpath):
 	return locations[entry.location](entry, os.path.dirname(projpath))
 
 def move_file(entry, to_dir):
+	global settings
+
 	fname = entry.path
 	new_fname = to_dir + "/" + fname
 
-	# try git
-	ret_code = os.system("git mv '" + fname + "' '" + new_fname + "'")
+	ret_code = os.system(settings.move_cmd + " '" + fname + "' '" + new_fname + "'")
 	if ret_code != 0:
-		# didn't work, normal move
-		ret_code = os.system("mv '" + fname + "' '" + new_fname + "'")
-		if ret_code != 0:
-			print >>sys.stderr, "couldn't rename " + fname + ": " + str(ret_code)
-			return
+		print >>sys.stderr, "couldn't rename " + fname + ": " + str(ret_code)
+		return
 
 
 def project_file_update(entry, to_dir, rewrites):
@@ -197,11 +195,18 @@ class Settings:
 settings = Settings()
 settings.rename = True
 settings.rewrite_projfile = True
+settings.move_cmd = 'mv'
 
-if len(sys.argv) == 1:
+args = sys.argv[1:]
+
+if len(args) > 0 and args[0] == '--git':
+	settings.move_cmd = 'git mv'
+	args = args[1:] # shift args
+
+if len(args) == 0:
 	usage()
 
-if commands.has_key(sys.argv[1]):
-	commands[sys.argv[1]]["fn"](sys.argv[2:])
+if commands.has_key(args[0]):
+	commands[args[0]]["fn"](args[1:])
 else:
 	usage()
