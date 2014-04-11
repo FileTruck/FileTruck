@@ -53,13 +53,32 @@ def full_listproj(argv):
 		ent.visit(entry_print, 0)
 
 
+# path methods
+def path_for_groups(entry):
+	path = ''
+	parent = entry.parent
+	while parent is not None:
+		path = parent.name + '/' + path
+		parent = parent.parent
+	return path
+
+def top_level_section(entry):
+	parent = entry.parent
+	while parent.parent:
+		parent = parent.parent
+	return parent
+
+# location handlers
+
 def location_absolute(entry, projdir):
 	# need to return the full path of entry
 	raise Unimplemented()
 
 def location_group(entry, projdir):
 	# need to walk up entry's parents building a path
-	raise Unimplemented()
+	path = path_for_groups(entry)
+	# root at the project file
+	return projdir + '/../' + path
 
 def location_srcroot(entry, projdir):
 	# relative to .xcodeproj - need to do some path wrangling
