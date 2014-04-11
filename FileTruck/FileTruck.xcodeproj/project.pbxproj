@@ -16,7 +16,7 @@
 		705EACCB18D06FA400ABB7DD /* FTWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 705EACC918D06FA400ABB7DD /* FTWindowController.xib */; };
 		705EACCE18D0770A00ABB7DD /* FTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EACCD18D0770A00ABB7DD /* FTController.m */; };
 		70618D5E18D084DB00F22908 /* projparser.py in Resources */ = {isa = PBXBuildFile; fileRef = 70618D5C18D084DB00F22908 /* projparser.py */; };
-		70618D5F18D084DB00F22908 /* retree in Resources */ = {isa = PBXBuildFile; fileRef = 70618D5D18D084DB00F22908 /* retree */; };
+		70618D5F18D084DB00F22908 /* retree.py in Resources */ = {isa = PBXBuildFile; fileRef = 70618D5D18D084DB00F22908 /* retree.py */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +35,7 @@
 		705EACCC18D0770A00ABB7DD /* FTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTController.h; sourceTree = "<group>"; };
 		705EACCD18D0770A00ABB7DD /* FTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTController.m; sourceTree = "<group>"; };
 		70618D5C18D084DB00F22908 /* projparser.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = projparser.py; path = projparse/projparser.py; sourceTree = "<group>"; };
-		70618D5D18D084DB00F22908 /* retree */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = retree; path = projparse/retree; sourceTree = "<group>"; };
+		70618D5D18D084DB00F22908 /* retree.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = retree.py; path = projparse/retree.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,7 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				70618D5C18D084DB00F22908 /* projparser.py */,
-				70618D5D18D084DB00F22908 /* retree */,
+				70618D5D18D084DB00F22908 /* retree.py */,
 				7043111218C8B7BF0061D398 /* InfoPlist.strings */,
 				7043111118C8B7BF0061D398 /* FileTruck-Info.plist */,
 				7043111818C8B7BF0061D398 /* FileTruck-Prefix.pch */,
@@ -157,7 +157,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				70618D5F18D084DB00F22908 /* retree in Resources */,
+				70618D5F18D084DB00F22908 /* retree.py in Resources */,
 				703BAC1F18D31A4900AE1DB5 /* fileTruckPreferences.plist in Resources */,
 				70618D5E18D084DB00F22908 /* projparser.py in Resources */,
 				7043111418C8B7BF0061D398 /* InfoPlist.strings in Resources */,
