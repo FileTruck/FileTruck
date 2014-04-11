@@ -75,8 +75,8 @@ def location_sdkroot(entry, projdir):
 	raise Unimplemented()
 
 locations = {
-	"<absolute>": location_absolute,
-	"<group>": location_group,
+	'"<absolute>"': location_absolute,
+	'"<group>"': location_group,
 	"SOURCE_ROOT": location_srcroot,
 	"DEVELOPER_DIR": location_dev_dir,
 	"BUILT_PRODUCTS_DIR": location_built_dir,
