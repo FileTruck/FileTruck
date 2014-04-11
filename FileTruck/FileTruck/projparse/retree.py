@@ -143,7 +143,11 @@ def reorder_section(section, rewrites, projpath):
 	def rename_file(entry, rewrites):
 		global settings
 
-		new_path = construct_dir_for_entry(entry, projpath)
+		try:
+			new_path = construct_dir_for_entry(entry, projpath)
+		except:
+			print >>sys.stderr, "can't move %s - unimplemented" % entry.name
+			return
 
 		if settings.rename:
 			move_file(entry, new_path, os.path.dirname(projpath))
