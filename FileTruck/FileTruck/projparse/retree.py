@@ -107,15 +107,29 @@ def construct_dir_for_entry(entry, projpath):
 	assert entry.location is not None
 	return locations[entry.location](entry, os.path.dirname(projpath))
 
-def move_file(entry, to_dir):
+def quote(path):
+	return "'" + path + "'"
+
+def move_file(entry, to_dir, projpath):
 	global settings
 
-	fname = entry.path
-	new_fname = to_dir + "/" + fname
+	top_level = top_level_section(entry)
+	old_fname = projpath + '/../' + top_level.name + '/' + entry.path
 
-	ret_code = os.system(settings.move_cmd + " '" + fname + "' '" + new_fname + "'")
+	new_fname = to_dir + '/' + entry.name
+
+	ret_code = os.system(
+			settings.move_cmd + \
+					" " + \
+					quote(fname) + \
+					" " + \
+					quote(new_fname))
+
 	if ret_code != 0:
-		print >>sys.stderr, "couldn't rename " + fname + ": " + str(ret_code)
+		print >>sys.stderr, \
+				"couldn't rename " + \
+				fname + \
+				" (returned  " + str(ret_code) + ")"
 		return
 
 
@@ -132,7 +146,7 @@ def reorder_section(section, rewrites, projpath):
 		new_path = construct_dir_for_entry(entry, projpath)
 
 		if settings.rename:
-			move_file(entry, new_path)
+			move_file(entry, new_path, os.path.dirname(projpath))
 		if settings.rewrite_projfile:
 			project_file_update(entry, new_path, rewrites)
 
