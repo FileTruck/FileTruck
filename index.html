@@ -1,56 +1,103 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
-    <title>Filetruck by ChrisGrant</title>
-  </head>
+  <title>FileTruck</title>
+</head>
 
-  <body>
-    <header>
-      <div class="inner">
-        <h1>Filetruck</h1>
-        <h2>An Xcode plugin to replicate your Xcode group structure on the filesystem.</h2>
-        <a href="https://github.com/ChrisGrant/FileTruck" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+<body>
+  <header>
+    <div class="inner">
+      <h1>FileTruck</h1>
+      <h2>An Xcode plugin which replicates your Xcode group structure on the file system.</h2>
+      <a href="https://github.com/ChrisGrant/FileTruck" class="button button-top"><small>View project on</small>GitHub</a>
+      <a href="https://github.com/ChrisGrant/FileTruck/zipball/master" class="button button-bottom"><small>Download</small>.zip file</a>
+    </div>
+  </header>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+  <div id="content-wrapper">
+    <div class="inner clearfix">
+      <section id="main-content">
 
-<p>Built by <a href="https://github.com/bobrippling" class="user-mention">@bobrippling</a> and <a href="https://github.com/chrisgrant" class="user-mention">@chrisgrant</a></p>
+        <h2>
+          <a name="what-is-filetruck" class="anchor" href="#what-is-filetruck">
+            <span class="octicon octicon-link">What is FileTruck?</span>
+          </a>
+        </h2>
+
+        <p>
+          FileTruck is an Xcode plugin that you can use to replicate your Xcode group structure on the file system.
+          For every group in your Xcode project, a directory will be created on the file system, and move all of files in that group into the directory.
+          We built FileTruck for large projects where manually keeping the correct files in directories that correspond to xcode project groups can quickly become unmanageable.
+        </p>
+
+        <h2>
+          <a name="installation" class="anchor" href="#installation">
+            <span class="octicon octicon-link">Installation</span>
+          </a>
+        </h2>
+
+        <p>
+          To install FileTruck, download the Xcode project from GitHub and build it. Restart Xcode, and the plugin will be installed in
+          <pre>~/Library/Application Support/Developer/Shared/Xcode/Plug-ins</pre>
+          To uninstall FileTruck, simply remove the FileTruck plugin from that directory.
+        </p>
+
+        <h2>
+          <a name="usage" class="anchor" href="#usage">
+            <span class="octicon octicon-link">Usage</span>
+          </a>
+        </h2>
+
+        <p>
+          To access FileTruck, you use the Xcode Editor Menu. Simply select Editor > FileTruck. You can then use FileTruck in two ways;
+          <b>run once</b>, or <b>monitor</b>.
+        </p>
+
+        <img src='images/window.png'>
+
+        <p>
+          Run once will replicate your current group structure of your project on the file system, move all of your files into the correct, corresponding directories and then rewrite your Xcode project to point at the correct file locations.
+          If you add files or groups to your project and want these to be in the correct location on the file system, you will have to run it again.
+        </p>
+
+        <p>
+          Monitor, on the other hand, when enabled, will monitor your project's group structure. It will continously update the file system to reflect the changes made to your xcode project structure, whether you move a create or move files or groups.
+          To enable monitor, select the checkbox next to the project file path in the FileTruck window.
+        </p>
+
+        <p>
+          <b>If your project is not under version control, we <i>strongly</i> recommend that you take a backup of it before enabling monitoring or running File Truck for the first time.</b>
+          Although we have done our best to test FileTruck extensively, due to the many differences and set ups in Xcode projects, we can't guarantee that it will work first time. If you do have a problem, please <a href='https://github.com/ChrisGrant/FileTruck/issues?state=open'>report an issue</a>.
+        </p>
+
+        <h3><a name="authors-and-contributors" class="anchor" href="#authors-and-contributors">
+          <span class="octicon octicon-link"></span>Authors and Contributors</a>
+        </h3>
+
+        <p>Built by <a href="https://github.com/chrisgrant" class="user-mention">@chrisgrant</a> and <a href="https://github.com/bobrippling" class="user-mention">@bobrippling</a>.</p>
+
         </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/ChrisGrant/FileTruck/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/ChrisGrant/FileTruck/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
-
-          <p class="repo-owner"><a href="https://github.com/ChrisGrant/FileTruck"></a> is maintained by <a href="https://github.com/ChrisGrant">ChrisGrant</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
       </div>
     </div>
 
-  
+    <footer>
+      <div class='inner'>
+        <p>This page is a modified version of a page generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+      </div>
+    </footer>
+
   </body>
-</html>
+  </html>
