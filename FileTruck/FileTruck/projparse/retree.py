@@ -148,9 +148,15 @@ def move_file(entry, to_dir, projpath):
 
 
 def project_file_update(entry, to_dir, rewrites):
+	# TODO dispatch based on type, e.g. "<group>"
+
+	path = os.path.normpath(to_dir + '/' + entry.name)
+	# strip top level, since we've assumed "<group>"
+	path = '/'.join( path.split('/')[1:] )
+
 	rewrites.append({
 		'id': entry.id,
-		'path': to_dir + '/' + entry.name
+		'path': path
 	})
 
 def reorder_section(section, rewrites, projpath):
