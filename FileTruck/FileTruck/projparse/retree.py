@@ -193,10 +193,17 @@ def rewrite_projfile(proj_path, rewrites):
 			line = line_and_idx[0]
 			matched = id_regex.match(line)
 			if matched:
-				# found - rewrite path=...
+				# if there's no "name = ...;" and the path has a '/' then we need to make one
+				# since Xcode uses the path if there's no name
+				name_to_insert = ''
+				new_path = rewrite['path']
+				if line.find('name =') == -1 and new_path.find('/'):
+					name_to_insert = "name = '" + new_path.split('/')[-1] + "';"
+
 				index = line_and_idx[1]
 				lines[index] = matched.groups()[0] + \
-						'path = "' + rewrite['path'] + '";' + \
+						name_to_insert + \
+						'path = "' + new_path + '";' + \
 						matched.groups()[1] + "\n"
 				break
 
