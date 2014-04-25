@@ -4,6 +4,7 @@ import fileinput
 import sys
 import os
 import re
+import errno
 
 import projparser
 
@@ -110,6 +111,17 @@ def construct_dir_for_entry(entry, projpath):
 def quote(path):
 	return "'" + path + "'"
 
+def mkdir_p(dir):
+	try:
+		os.makedirs(dir)
+	except OSError as e:
+		if e.errno == errno.EEXIST:
+			# this is fine
+			return
+		# otherwise rethrow
+		raise
+
+
 def move_file(entry, to_dir, projpath):
 	global settings
 
@@ -117,6 +129,8 @@ def move_file(entry, to_dir, projpath):
 	old_fname = projpath + '/../' + top_level.name + '/' + entry.path
 
 	new_fname = to_dir + '/' + entry.name
+
+	mkdir_p(to_dir)
 
 	ret_code = os.system(
 			settings.move_cmd + \
