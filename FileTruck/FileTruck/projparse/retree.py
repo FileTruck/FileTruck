@@ -121,14 +121,14 @@ def move_file(entry, to_dir, projpath):
 	ret_code = os.system(
 			settings.move_cmd + \
 					" " + \
-					quote(fname) + \
+					quote(old_fname) + \
 					" " + \
 					quote(new_fname))
 
 	if ret_code != 0:
 		print >>sys.stderr, \
 				"couldn't rename " + \
-				fname + \
+				old_fname + \
 				" (returned  " + str(ret_code) + ")"
 		return
 
