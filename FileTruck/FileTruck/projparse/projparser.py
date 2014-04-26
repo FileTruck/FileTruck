@@ -67,7 +67,7 @@ def parse_proj(lines):
 
 	file_reference_regex = re.compile(
 			'\s*([0-9A-F]+) /\* ([^*]+) \*/ = .* ' +
-			'path = ([^;]+); sourceTree = ([^;]+);',
+			'path = "?([^;"]+)"?; sourceTree = ([^;]+);',
 			re.I)
 
 	entries = {}

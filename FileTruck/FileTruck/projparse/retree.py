@@ -4,6 +4,7 @@ import fileinput
 import sys
 import os
 import re
+import errno
 
 import projparser
 
@@ -110,6 +111,17 @@ def construct_dir_for_entry(entry, projpath):
 def quote(path):
 	return "'" + path + "'"
 
+def mkdir_p(dir):
+	try:
+		os.makedirs(dir)
+	except OSError as e:
+		if e.errno == errno.EEXIST:
+			# this is fine
+			return
+		# otherwise rethrow
+		raise
+
+
 def move_file(entry, to_dir, projpath):
 	global settings
 
@@ -118,25 +130,33 @@ def move_file(entry, to_dir, projpath):
 
 	new_fname = to_dir + '/' + entry.name
 
+	mkdir_p(to_dir)
+
 	ret_code = os.system(
 			settings.move_cmd + \
 					" " + \
-					quote(fname) + \
+					quote(old_fname) + \
 					" " + \
 					quote(new_fname))
 
 	if ret_code != 0:
 		print >>sys.stderr, \
 				"couldn't rename " + \
-				fname + \
+				old_fname + \
 				" (returned  " + str(ret_code) + ")"
 		return
 
 
 def project_file_update(entry, to_dir, rewrites):
+	# TODO dispatch based on type, e.g. "<group>"
+
+	path = os.path.normpath(to_dir + '/' + entry.name)
+	# strip top level, since we've assumed "<group>"
+	path = '/'.join( path.split('/')[1:] )
+
 	rewrites.append({
 		'id': entry.id,
-		'path': to_dir + '/' + entry.name
+		'path': path
 	})
 
 def reorder_section(section, rewrites, projpath):
@@ -173,10 +193,17 @@ def rewrite_projfile(proj_path, rewrites):
 			line = line_and_idx[0]
 			matched = id_regex.match(line)
 			if matched:
-				# found - rewrite path=...
+				# if there's no "name = ...;" and the path has a '/' then we need to make one
+				# since Xcode uses the path if there's no name
+				name_to_insert = ''
+				new_path = rewrite['path']
+				if line.find('name =') == -1 and new_path.find('/'):
+					name_to_insert = "name = '" + new_path.split('/')[-1] + "';"
+
 				index = line_and_idx[1]
 				lines[index] = matched.groups()[0] + \
-						'path = "' + rewrite['path'] + '";' + \
+						name_to_insert + \
+						'path = "' + new_path + '";' + \
 						matched.groups()[1] + "\n"
 				break
 
