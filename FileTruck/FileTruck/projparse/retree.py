@@ -159,6 +159,15 @@ def project_file_update(entry, to_dir, rewrites):
 		'path': path
 	})
 
+def ignore_entry(entry):
+	framework = 'framework'
+
+	# take a slice from end-len(framework) to the end:
+	slice = entry.name[-len(framework):]
+
+	return slice == framework
+
+
 def reorder_section(section, rewrites, projpath):
 	def rename_file(entry, rewrites):
 		global settings
@@ -177,7 +186,10 @@ def reorder_section(section, rewrites, projpath):
 	for child_key in section.children.keys():
 		child = section.children[child_key]
 		if child.is_file():
-			rename_file(child, rewrites)
+			if ignore_entry(child):
+				print >>sys.stderr, "ignoring %s" % child.name
+			else:
+				rename_file(child, rewrites)
 		else:
 			reorder_section(child, rewrites, projpath)
 
