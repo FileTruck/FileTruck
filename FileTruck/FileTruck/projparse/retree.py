@@ -271,7 +271,7 @@ class Settings:
 settings = Settings()
 settings.rename = True
 settings.rewrite_projfile = True
-settings.move_cmd = 'mv'
+settings.move_cmd = 'mv -v'
 
 args = sys.argv[1:]
 
