@@ -24,7 +24,7 @@ def get_entries(path):
 	try:
 		lines = read_file(path)
 	except Exception as e:
-		print >>sys.stderr, e
+		print >>sys.stderr, "%s (at get_entries())" % e
 		sys.exit(1)
 	return projparser.parse(lines)
 
