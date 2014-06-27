@@ -105,7 +105,7 @@ locations = {
 
 def construct_dir_for_entry(entry, projpath):
 	""" returns a /-terminated path """
-	assert entry.location is not None
+	assert entry.location is not None, "no entry location?!"
 	return locations[entry.location](entry, os.path.dirname(projpath))
 
 def quote(path):
