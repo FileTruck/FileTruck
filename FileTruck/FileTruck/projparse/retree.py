@@ -20,9 +20,9 @@ def write_file(fname, lines):
 			if len(line):
 				f.write(line)
 
-def get_entries(argv):
+def get_entries(path):
 	try:
-		lines = read_file(argv[0])
+		lines = read_file(path)
 	except Exception as e:
 		print >>sys.stderr, e
 		sys.exit(1)
@@ -226,9 +226,9 @@ def filesort(argv):
 		usage()
 
 	print "parsing projfile..."
-	sections_and_files = get_entries(argv)
-
 	projpath = argv[0]
+
+	sections_and_files = get_entries(projpath)
 	rewrites = []
 
 	print "reordering files..."
@@ -236,7 +236,7 @@ def filesort(argv):
 		reorder_section(section, rewrites, projpath)
 
 	print "rewriting projfile..."
-	rewrite_projfile(argv[0], rewrites)
+	rewrite_projfile(projpath, rewrites)
 
 commands = {
 	"list": {
