@@ -11,6 +11,6 @@
 
 @interface FTWindowController : NSWindowController
 
-- (id)initWithController:(FTController*)controller;
+- (instancetype)initWithController:(FTController *)controller;
 
 @end

@@ -22,7 +22,7 @@
 
 NSString const *MonitoredPathsKey = @"MonitoredPaths";
 
-- (id)initWithBundle:(NSBundle *)plugin {
+- (instancetype)initWithBundle:(NSBundle *)plugin {
     if(self = [super init]) {
         self.bundle = plugin;
         
@@ -95,7 +95,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-- (void)projectSavedNotification:(NSNotification*)notification {
+- (void)projectSavedNotification:(NSNotification *)notification {
     id object = [notification object];
     NSString *path = [object path];
     if([self.monitoredFilePaths containsObject:path]) {
@@ -103,7 +103,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-- (void)projectOpened:(NSNotification*)notification {
+- (void)projectOpened:(NSNotification *)notification {
 #warning TODO - Remove this horrible hack. Refresh Project Files can't find anything if it's called straight away.
     [self performSelector:@selector(refreshProjectFiles) withObject:nil afterDelay:2.0];
 }
@@ -112,7 +112,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     [self refreshProjectFiles];
 }
 
-- (void)runScriptOnItem:(IDEFileNavigableItem*)item {
+- (void)runScriptOnItem:(IDEFileNavigableItem *)item {
     NSString *scriptPath = [FTController findScriptFilePathInBundle:self.bundle];
     if(scriptPath) {
         IDEFileReference *fileReference = [item representedObject];
@@ -122,7 +122,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-- (void)runScriptOnProjectPath:(NSString*)path {
+- (void)runScriptOnProjectPath:(NSString *)path {
     NSString *scriptPath = [FTController findScriptFilePathInBundle:self.bundle];
     if(scriptPath) {
         path = [path stringByAppendingPathComponent:@"project.pbxproj"];
@@ -132,7 +132,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-- (void)runScript:(NSString*)script onProjectFile:(NSString*)project {
+- (void)runScript:(NSString *)script onProjectFile:(NSString *)project {
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:script];
     
@@ -161,7 +161,7 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
             break;
         }
         
-        IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController*)windowController;
+        IDEWorkspaceWindowController *workspaceController = (IDEWorkspaceWindowController *)windowController;
         IDEWorkspaceTabController *workspaceTabController = [workspaceController activeWorkspaceTabController];
         IDENavigatorArea *navigatorArea = [workspaceTabController navigatorArea];
         
@@ -198,11 +198,11 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     }
 }
 
-+ (NSString*)findScriptFilePathInBundle:(NSBundle*)bundle {
++ (NSString *)findScriptFilePathInBundle:(NSBundle*)bundle {
     return [bundle pathForResource:@"retree" ofType:@"py"];
 }
 
-- (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project {
+- (BOOL)isProjectMonitored:(IDEFileNavigableItem *)project {
     return [self.monitoredFilePaths containsObject:[FTController filePathStringFromProject:project]];
 }
 
@@ -212,24 +212,24 @@ NSString const *MonitoredPathsKey = @"MonitoredPaths";
     [dict writeToFile:[self preferencesFilePath] atomically:YES];
 }
 
-- (void)monitorProject:(IDEFileNavigableItem*)project {
+- (void)monitorProject:(IDEFileNavigableItem *)project {
     [self.monitoredFilePaths addObject:[FTController filePathStringFromProject:project]];
     [self writePathsToDict];
 }
 
-- (void)unmonitorProject:(IDEFileNavigableItem*)project {
+- (void)unmonitorProject:(IDEFileNavigableItem *)project {
     [self.monitoredFilePaths removeObject:[FTController filePathStringFromProject:project]];
     [self writePathsToDict];
 }
 
-+ (NSString*)filePathStringFromProject:(IDEFileNavigableItem*)project {
++ (NSString *)filePathStringFromProject:(IDEFileNavigableItem *)project {
     IDEFileReference *fileReference = [project representedObject];
     NSURL *folderURL = fileReference.resolvedFilePath.fileURL;
     NSString *path = folderURL.path;
     return path;
 }
 
-- (NSArray*)windowController {
+- (NSArray *)windowController {
     NSMutableArray *windowControllers = [NSMutableArray new];
     
     for(NSWindow *window in [NSApp windows]) {

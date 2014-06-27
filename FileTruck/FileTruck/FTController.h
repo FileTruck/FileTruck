@@ -56,11 +56,11 @@ typedef void (^ProjectFileSubscriber)(NSArray *projects);
 
 - (id)initWithBundle:(NSBundle *)plugin;
 
-- (void)runScriptOnItem:(IDEFileNavigableItem*)item;
+- (void)runScriptOnItem:(IDEFileNavigableItem *)item;
 
-- (BOOL)isProjectMonitored:(IDEFileNavigableItem*)project;
-- (void)monitorProject:(IDEFileNavigableItem*)project;
-- (void)unmonitorProject:(IDEFileNavigableItem*)project;
+- (BOOL)isProjectMonitored:(IDEFileNavigableItem *)project;
+- (void)monitorProject:(IDEFileNavigableItem *)project;
+- (void)unmonitorProject:(IDEFileNavigableItem *)project;
 
 - (void)addProjectFilesSubscriberBlock:(ProjectFileSubscriber)block;
 

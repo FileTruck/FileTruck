@@ -35,7 +35,7 @@ static FileTruck *sharedPlugin;
     }
 }
 
-- (id)initWithBundle:(NSBundle *)plugin {
+- (instancetype)initWithBundle:(NSBundle *)plugin {
     if (self = [super init]) {
         self.bundle = plugin;
         

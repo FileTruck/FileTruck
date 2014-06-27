@@ -17,13 +17,13 @@
 @property (weak) IBOutlet NSTableColumn *monitorColumn;
 @property (weak) IBOutlet NSTableColumn *runNowColumn;
 
-@property NSArray *projectFiles;
+@property (nonatomic, strong) NSArray *projectFiles;
 
 @end
 
 @implementation FTWindowController
 
-- (id)initWithController:(FTController*)controller {
+- (instancetype)initWithController:(FTController *)controller {
     if(self = [super initWithWindowNibName:@"FTWindowController"]) {
         self.controller = controller;
         __weak id weakSelf = self;
@@ -51,7 +51,7 @@
         return path;
     }
     else if(tableColumn == self.monitorColumn) {
-        return [NSNumber numberWithBool:[self.controller isProjectMonitored:item]];
+        return @([self.controller isProjectMonitored:item]);
     }
     
     return nil;
