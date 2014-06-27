@@ -69,6 +69,22 @@ def top_level_section(entry):
 		parent = parent.parent
 	return parent
 
+# project file path helper
+
+def get_relative_xcodeproj(projpath):
+	xcodeproj_location = projpath.find(".xcodeproj")
+	while projpath[xcodeproj_location]  != '/':
+		xcodeproj_location -= 1
+
+	# otherwise there's no .xcodeproj
+	assert xcodeproj_location >= 0, \
+			"couldn't find .xcodeproj in %s" % projpath
+
+	xcodeproj_location += 1
+
+	return projpath[xcodeproj_location:]
+
+
 # location handlers
 
 def location_absolute(entry, projdir):
@@ -79,7 +95,9 @@ def location_group(entry, projdir):
 	# need to walk up entry's parents building a path
 	path = path_for_groups(entry)
 	# root at the project file
-	return projdir + '/../' + path
+	move_path = projdir + '/../' + path
+	rewrite_path = get_relative_xcodeproj(move_path)
+	return move_path, rewrite_path
 
 def location_srcroot(entry, projdir):
 	# relative to .xcodeproj - need to do some path wrangling
@@ -173,15 +191,15 @@ def reorder_section(section, rewrites, projpath):
 		global settings
 
 		try:
-			new_path = construct_dir_for_entry(entry, projpath)
-		except:
-			print >>sys.stderr, "can't move %s - unimplemented" % entry.name
+			new_path, rewrite_path = construct_dir_for_entry(entry, projpath)
+		except Exception as e:
+			print >>sys.stderr, "can't move %s - %s" % (entry.name, e)
 			return
 
 		if settings.rename:
 			move_file(entry, new_path, os.path.dirname(projpath))
 		if settings.rewrite_projfile:
-			project_file_update(entry, new_path, rewrites)
+			project_file_update(entry, rewrite_path, rewrites)
 
 	for child_key in section.children.keys():
 		child = section.children[child_key]
