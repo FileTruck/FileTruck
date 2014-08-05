@@ -178,12 +178,35 @@ def project_file_update(entry, to_dir, rewrites):
 	})
 
 def ignore_entry(entry):
-	framework = 'framework'
+    def has_framework(entry):
+        framework = 'framework'
+        
+        # take a slice from end-len(framework) to the end:
+        slice = entry.name[-len(framework):]
+        
+        return slice == framework
 
-	# take a slice from end-len(framework) to the end:
-	slice = entry.name[-len(framework):]
-
-	return slice == framework
+    def has_lproj(entry):
+        path = path_for_groups(entry)
+        return path.find('.lproj/') != -1
+    
+    def has_storyboard(entry):
+        path = path_for_groups(entry)
+        return path.find('.storyboard/') != -1
+    
+    def has_strings(entry):
+        path = path_for_groups(entry)
+        return path.find('.strings/') != -1
+    
+    def has_xcdatamodel(entry):
+        path = path_for_groups(entry)
+        return path.find('.xcdatamodel/') != -1
+    
+    def has_xcassets(entry):
+        path = path_for_groups(entry)
+        return path.find('.xcassets/') != -1
+    
+    return has_framework(entry) or has_lproj(entry) or has_storyboard(entry) or has_strings(entry) or has_xcdatamodel(entry) or has_xcassets(entry)
 
 
 def reorder_section(section, rewrites, projpath):
