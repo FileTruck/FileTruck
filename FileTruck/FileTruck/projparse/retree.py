@@ -141,6 +141,9 @@ def mkdir_p(dir):
 
 
 def move_file(entry, to_dir, projpath):
+	def paths_equal(a, b):
+		return os.path.normpath(a) == os.path.normpath(b)
+
 	global settings
 
 	top_level = top_level_section(entry)
@@ -149,6 +152,9 @@ def move_file(entry, to_dir, projpath):
 	new_fname = to_dir + '/' + entry.name
 
 	mkdir_p(to_dir)
+
+	if paths_equal(old_fname, new_fname):
+		return
 
 	ret_code = os.system(
 			settings.move_cmd + \
